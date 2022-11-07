@@ -7,24 +7,14 @@
 
 class TextureStorage
 {
-public:
-    enum TextureNames {
-        CAR_T,
-        BACKGROUND_TEMP_T,
-        MAXTEXTURENAMES_T
-    };
 private:
-    std::array<std::string, MAXTEXTURENAMES_T> m_txtrStrs{
-        "res/car.png",
-        "res/Jermaidiot.png"
-    };
-    std::array<Texture2D, MAXTEXTURENAMES_T> m_txtrs;
+    std::vector<std::pair<Texture2D, std::string>> m_txtrs;
 public:
-    void init() // call this AFTER you call InitWindow()
-    {
-        for (int i{}; i < MAXTEXTURENAMES_T; ++i)
+    void init(const std::vector<std::string>& txtrStrs) // call this AFTER you call InitWindow()
+    {                                                   // the first texture is recommended to be an error texture
+        for (int i{}; i < txtrStrs.size(); ++i)
         {
-            m_txtrs[i] = LoadTexture(m_txtrStrs[i].c_str());
+            m_txtrs.push_back({LoadTexture(txtrStrs[i].c_str()), txtrStrs[i]});
         }
     }
 
@@ -32,14 +22,20 @@ public:
     {
         for (auto& t : m_txtrs)
         {
-            UnloadTexture(t);
+            UnloadTexture(t.first);
         }
     }
 
-    const Texture2D& get(TextureNames t) const { return m_txtrs[t]; }
+    const Texture2D& get(std::string s) const
+    {
+        for (auto& t : m_txtrs)
+        {
+            if (t.second == s)
+                return t.first;
+        }
+        return m_txtrs[0].first;
+    }
 };
-
-using TxtrNam = TextureStorage::TextureNames;
 
 TextureStorage& txtrStrg(); // im a sneaky snitch, i use a function instead of a pure global variable to get past c++ being stupid asf
                             // also you probably shouldn't make a local TextureStorage, i think it would just waste memory

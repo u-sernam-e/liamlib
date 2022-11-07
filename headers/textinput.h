@@ -13,7 +13,7 @@ private:
     Vector2 m_size{500, 300};
     bool m_isResizeable{true};
     int m_typeMode{0}; // 0 for text, 1 for numbers
-    FontNam m_font{FontNam::KINGTHINGSEXETER_T};
+    std::string m_font{"fonts/KingthingsExeter.ttf"};
     int m_fontSize{20};
     int m_fontSpacing{2};
     Color m_bkgrndCol{GRAY};
@@ -37,7 +37,7 @@ public:
     Vector2 size={500, 300},
     bool isResizeable=true,
     int typeMode=0, // 0 for text, 1 for numbers
-    FontNam font=FontNam::KINGTHINGSEXETER_T,
+    std::string font="fonts/KingthingsExeter.ttf",
     int fontSize=20,
     int fontSpacing=2,
     Color bkgrndCol=GRAY,
