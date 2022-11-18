@@ -40,6 +40,9 @@ public:
     void update() override;
     void draw() override;
 
+    void setPos(Vector2 p) {m_pos = p;}
+    Vector2 getPos() {return m_pos;}
+
     bool down();
     bool pressed();
     bool released();
