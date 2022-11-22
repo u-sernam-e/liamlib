@@ -21,7 +21,7 @@ private:
     Color m_upTint{};
     Color m_hoverTint{};
     Color m_downTint{};
-    const Texture2D& m_txtr{};
+    Texture2D m_txtr{};
     std::string m_txt{};
     bool m_hasTxtr{};
     State m_state{};
