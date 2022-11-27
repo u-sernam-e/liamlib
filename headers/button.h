@@ -37,6 +37,8 @@ public:
         , m_txtr{texture}
     {}
 
+    Button() = default;
+
     void update() override;
     void draw() override;
 
