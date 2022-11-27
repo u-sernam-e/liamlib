@@ -61,10 +61,24 @@ Vector2 vecAbs(const Vector2& a)
 // this could be optimized with a faster sqrt func
 float vec2distance(const Vector2& a, const Vector2& b)
 { return std::sqrt( (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y) ); } 
-
 float lowerLimitFrameTime()
 {
     if (GetFrameTime() > 0.0667)
         return 0.0667;
     return GetFrameTime();
+}
+float vec2ToFloat(Vector2 x)
+{
+    return vec2distance(x, {0, 0});
+}
+float vec2ToAngle(Vector2 x)
+{
+    float output{atanf(x.y/x.x) * RAD2DEG};
+    if (x.x < 0) output += 180;
+    else if (x.y < 0) output += 360;
+    return output;
+}
+Vector2 floatAngleToVec2(float x, float angle)
+{
+    return {cosf(angle * DEG2RAD) * x, sinf(angle * DEG2RAD) * x};
 }
