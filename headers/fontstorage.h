@@ -14,7 +14,7 @@ public:
     {
         for (int i{}; i < fontStrs.size(); ++i)
         {
-            m_fonts.push_back({LoadFontEx(fontStrs[i].c_str(), 64, 0, 250), fontStrs[i]});
+            m_fonts.push_back({LoadFontEx(fontStrs[i].c_str(), 8, NULL, 0), fontStrs[i]});
         }
     }
 

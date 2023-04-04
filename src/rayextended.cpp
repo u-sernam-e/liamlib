@@ -1,6 +1,8 @@
 #include "rayextended.h"
 #include "raylib.h"
 #include <cmath>
+#include <algorithm>
+#include <array>
 
 Vector2 operator-(const Vector2& a)
 { return {-a.x, -a.y}; }
@@ -73,6 +75,8 @@ float vec2ToFloat(Vector2 x)
 }
 float vec2ToAngle(Vector2 x)
 {
+    if (x == Vector2{0, 0})
+        return 0;
     float output{atanf(x.y/x.x) * RAD2DEG};
     if (x.x < 0) output += 180;
     else if (x.y < 0) output += 360;
@@ -81,4 +85,36 @@ float vec2ToAngle(Vector2 x)
 Vector2 floatAngleToVec2(float x, float angle)
 {
     return {cosf(angle * DEG2RAD) * x, sinf(angle * DEG2RAD) * x};
+}
+
+Rectangle getRotatedRecBounds(Rectangle rec, float rot, Vector2 anchor)
+{
+    std::array<Vector2, 4> crnrs{
+        floatAngleToVec2(vec2distance({rec.x, rec.y}, anchor), vec2ToAngle(Vector2{rec.x, rec.y} - anchor) + rot) + anchor,
+        floatAngleToVec2(vec2distance({rec.x + rec.width, rec.y}, anchor), vec2ToAngle(Vector2{rec.x + rec.width, rec.y} - anchor) + rot) + anchor,
+        floatAngleToVec2(vec2distance({rec.x + rec.width, rec.y + rec.height}, anchor), vec2ToAngle(Vector2{rec.x + rec.width, rec.y + rec.height} - anchor) + rot) + anchor,
+        floatAngleToVec2(vec2distance({rec.x, rec.y + rec.height}, anchor), vec2ToAngle(Vector2{rec.x, rec.y + rec.height} - anchor) + rot) + anchor
+    };
+
+    Vector2 TRpnt{
+        std::min(std::initializer_list<float>{crnrs[0].x, crnrs[1].x, crnrs[2].x, crnrs[3].x}),
+        std::min(std::initializer_list<float>{crnrs[0].y, crnrs[1].y, crnrs[2].y, crnrs[3].y})
+    };
+
+    Vector2 BLpnt{
+        std::max(std::initializer_list<float>{crnrs[0].x, crnrs[1].x, crnrs[2].x, crnrs[3].x}),
+        std::max(std::initializer_list<float>{crnrs[0].y, crnrs[1].y, crnrs[2].y, crnrs[3].y})
+    };
+
+    return{
+        TRpnt.x,
+        TRpnt.y,
+        BLpnt.x - TRpnt.x,
+        BLpnt.y - TRpnt.y
+    };
+}
+bool checkCollisionPointRotatedRec(Vector2 point, Rectangle rec, float rot, Vector2 anchor)
+{
+    Vector2 newPoint{floatAngleToVec2(vec2distance(point, anchor), vec2ToAngle(point - anchor) - rot) + anchor}; // counter rotate the point
+    return CheckCollisionPointRec(newPoint, rec);
 }

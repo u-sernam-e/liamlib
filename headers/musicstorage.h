@@ -26,7 +26,7 @@ public:
         }
     }
 
-    const Music& get(std::string s) const
+    Music& get(std::string s)
     {
         for (auto& t : m_mscs)
         {

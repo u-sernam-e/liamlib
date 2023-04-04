@@ -39,6 +39,9 @@ float vec2ToFloat(Vector2 x);
 float vec2ToAngle(Vector2 x);
 Vector2 floatAngleToVec2(float x, float angle);
 
+Rectangle getRotatedRecBounds(Rectangle rec, float rot, Vector2 anchor); // basically a big unrotated unrectangle that has the rotated rectangle perfectly inside it
+bool checkCollisionPointRotatedRec(Vector2 point, Rectangle rec, float rot, Vector2 anchor); // assuming rec is rotated around center
+
 struct Circle
 {
     Vector2 pos;

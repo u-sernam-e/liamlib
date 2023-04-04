@@ -23,6 +23,7 @@ private:
     Color m_resizeCrclSelectedCol{LIGHTGRAY};
     int m_resizeCrclRadius{10};
     float m_selectionFlashRate{.25};
+    bool m_hidden{false};
     
     std::string m_txt{};
     bool m_isSelected{};
@@ -34,19 +35,19 @@ private:
 
 public:
     TextInput(Vector2 pos={100, 100},
-    Vector2 size={500, 300},
-    bool isResizeable=true,
-    int typeMode=0, // 0 for text, 1 for numbers
-    std::string font="fonts/KingthingsExeter.ttf",
-    int fontSize=20,
-    int fontSpacing=2,
-    Color bkgrndCol=GRAY,
-    Color txtCol=BLACK,
-    Color selectedTxtCol=MAROON,
-    Color resizeCrclCol=DARKGRAY,
-    Color resizeCrclSelectedCol=LIGHTGRAY,
-    int resizeCrclRadius=10,
-    float selectionFlashRate=.25)
+            Vector2 size={500, 300},
+            bool isResizeable=true,
+            int typeMode=0, // 0 for text, 1 for numbers
+            std::string font="fonts/KingthingsExeter.ttf",
+            int fontSize=20,
+            int fontSpacing=2,
+            Color bkgrndCol=GRAY,
+            Color txtCol=BLACK,
+            Color selectedTxtCol=MAROON,
+            Color resizeCrclCol=DARKGRAY,
+            Color resizeCrclSelectedCol=LIGHTGRAY,
+            int resizeCrclRadius=10,
+            float selectionFlashRate=.25)
         : m_pos{pos}
         , m_size{size}
         , m_isResizeable{isResizeable}
@@ -75,6 +76,9 @@ public:
     void submit() { m_txt = ""; m_justSubmitted = true; }
     void setResizeable(bool isResizeable) { m_isResizeable = isResizeable; }
     void setTypeMode(int mode) { submit(); m_typeMode = mode; }
+
+    void setHid(bool hidden) {m_hidden = hidden;}
+    bool getHid() {return m_hidden;}
 };  
 
 #endif

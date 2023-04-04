@@ -239,6 +239,9 @@ void TextInput::update()
 
 void TextInput::draw()
 {
+    if (m_hidden)
+        return;
+
     if (m_isSelected && m_selectionTimer < m_selectionFlashRate)
         m_txt += '>';
 
