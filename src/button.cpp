@@ -21,14 +21,14 @@ void Button::update()
     }
 }
 
-int maxXTextSize(const std::string& txt, int xSize, int depth) // for the text when no texture
+int maxXTextSize(const std::string& txt, Font font, int xSize, int depth) // for the text when no texture
 {
     int maxSize{xSize-10};
     int minSize{};
     for (int i{}; i < depth; ++i)
     {
         int guess{(maxSize + minSize) / 2};
-        int guessXSize{MeasureText(txt.c_str(), guess)};
+        int guessXSize{MeasureTextEx(font, txt.c_str(), guess, 2).x};
         if (guessXSize > xSize-10)
         {
             maxSize = guess;
@@ -52,33 +52,28 @@ void Button::draw()
 
     Vector2 activePos{(m_anchorRight ? GetScreenWidth() - m_pos.x : m_pos.x), (m_anchorBot ? GetScreenHeight() - m_pos.y : m_pos.y)};
 
+    Color col{};
     switch (m_state)
     {
         case HOVER:
-            if (m_hasTxtr)
-                DrawTexture(m_txtr, activePos.x, activePos.y, m_hoverTint);
-            else
-                DrawRectangleV(activePos, m_size, m_hoverTint);
+            col = m_hoverTint;
             break;
-        
         case UP:
         case RELEASED:
-            if (m_hasTxtr)
-                DrawTexture(m_txtr, activePos.x, activePos.y, m_upTint);
-            else
-                DrawRectangleV(activePos, m_size, m_upTint);
+            col = m_upTint;
             break;
-        
         case DOWN:
         case PRESSED:
-            if (m_hasTxtr)
-                DrawTexture(m_txtr, activePos.x, activePos.y, m_downTint);
-            else
-                DrawRectangleV(activePos, m_size, m_downTint);
+            col = m_downTint;
             break;
     }
-    int fsize{std::min(static_cast<int>(m_size.y) - 10, maxXTextSize(m_txt, m_size.x, 10))};
-    DrawText(m_txt.c_str(), (activePos.x + m_size.x/2) - MeasureText(m_txt.c_str(), fsize)/2, (activePos.y + m_size.y/2) - fsize/2, fsize, WHITE);
+    if (m_hasTxtr)
+        DrawTextureNPatch(m_txtr, m_nPatchInfo, {activePos.x, activePos.y, m_size.x, m_size.y}, {0, 0}, 0, col);
+    else
+        DrawRectangleV(activePos, m_size, col);
+
+    int fsize{std::min(static_cast<int>(m_size.y) - 10, maxXTextSize(m_txt, m_font, m_size.x, 10))};
+    DrawTextEx(m_font, m_txt.c_str(), Vector2{(activePos.x + m_size.x/2) - MeasureTextEx(m_font, m_txt.c_str(), fsize, 2).x/2, (activePos.y + m_size.y/2) - fsize/2}, fsize, 2, WHITE);
 }
 
 

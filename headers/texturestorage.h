@@ -15,6 +15,7 @@ public:
         for (int i{}; i < txtrStrs.size(); ++i)
         {
             m_txtrs.push_back({LoadTexture(txtrStrs[i].c_str()), txtrStrs[i]});
+            SetTextureFilter(m_txtrs[i].first, TEXTURE_FILTER_BILINEAR);
         }
     }
 

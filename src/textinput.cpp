@@ -156,6 +156,10 @@ static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, 
 
 void TextInput::update()
 {
+    if (m_justSubmitted)
+        m_txt = "";
+    m_justSubmitted = false;
+    
     // resizing/repositioning
     if (m_isResizeable)
     {
@@ -201,14 +205,14 @@ void TextInput::update()
         static const std::string upperOtherTypeableKeys {"\"<_>?!@#$%^&*():+{|}~ "};
         
         if (IsKeyPressed(KEY_CAPS_LOCK)) m_capsLockOn = !m_capsLockOn;
-        bool shiftCaps{IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)};
+        bool shift{IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)};
 
         if (m_typeMode == 0) // text mode
         {
             std::string lKeys{getKeysPressed(letterKeys)}; // letters
             for (char& k : lKeys)
             {
-                if (m_capsLockOn == shiftCaps)
+                if (m_capsLockOn == shift)
                     k = lowerLetterKeys[letterKeys.find(k)];
             }
             m_txt += lKeys;
@@ -216,7 +220,7 @@ void TextInput::update()
             std::string oKeys{getKeysPressed(otherTypeableKeys)}; // other keys
             for (char& k : oKeys)
             {
-                if (shiftCaps)
+                if (shift)
                     k = upperOtherTypeableKeys[otherTypeableKeys.find(k)];
             }
             m_txt += oKeys;
@@ -229,19 +233,39 @@ void TextInput::update()
             for (int k : getKeysPressed("1234567890"))
                 m_txt += static_cast<char>(k);
         }
-    }
-    
-    if (IsKeyPressed(KEY_BACKSPACE) && !m_txt.empty())
+        if (m_typeMode == 2) // letters mode
+        {
+            std::string lKeys{getKeysPressed(letterKeys)}; // letters
+            for (char& k : lKeys)
+            {
+                if (m_capsLockOn == shift)
+                    k = lowerLetterKeys[letterKeys.find(k)];
+            }
+            m_txt += lKeys;
+        }
+        if (m_typeMode == 3) // letters AND numbers (not punctuation & other keys) mode
+        {
+            for (int k : getKeysPressed("1234567890"))
+                m_txt += static_cast<char>(k);
+
+            std::string lKeys{getKeysPressed(letterKeys)}; // letters
+            for (char& k : lKeys)
+            {
+                if (m_capsLockOn == shift)
+                    k = lowerLetterKeys[letterKeys.find(k)];
+            }
+            m_txt += lKeys;
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE) && !m_txt.empty())
         m_txt.pop_back();
-    if (IsKeyPressed(KEY_ENTER))
-        submit();
+        if (IsKeyReleased(KEY_ENTER))
+            submit();
+    }
 }
 
 void TextInput::draw()
 {
-    if (m_hidden)
-        return;
-
     if (m_isSelected && m_selectionTimer < m_selectionFlashRate)
         m_txt += '>';
 
@@ -251,7 +275,10 @@ void TextInput::draw()
         DrawCircleV(m_pos + m_size, m_resizeCrclRadius, CheckCollisionPointCircle(GetMousePosition(), m_pos + m_size, m_resizeCrclRadius) || m_currentlyResizing ? m_resizeCrclSelectedCol : m_resizeCrclCol);
     }
     DrawRectangleV(m_pos, m_size, m_bkgrndCol);
-    DrawTextBoxedSelectable(fontStrg().get(m_font), m_txt.c_str(), {m_pos.x, m_pos.y, m_size.x, m_size.y}, m_fontSize, m_fontSpacing, true, m_txtCol, 0, 0, WHITE, BLUE);
+
+    Font f{m_font.empty() ? GetFontDefault() : fontStrg().get(m_font, 0)};
+
+    DrawTextBoxedSelectable(f, m_txt.c_str(), {m_pos.x, m_pos.y, m_size.x, m_size.y}, m_fontSize, m_fontSpacing, true, m_txtCol, 0, 0, WHITE, BLUE);
 
     if (m_isSelected && m_selectionTimer < m_selectionFlashRate)
         m_txt.pop_back();

@@ -118,3 +118,13 @@ bool checkCollisionPointRotatedRec(Vector2 point, Rectangle rec, float rot, Vect
     Vector2 newPoint{floatAngleToVec2(vec2distance(point, anchor), vec2ToAngle(point - anchor) - rot) + anchor}; // counter rotate the point
     return CheckCollisionPointRec(newPoint, rec);
 }
+bool checkCollisionCircleRotatedRec(Vector2 pos, float rad, Rectangle rec, float rot, Vector2 anchor)
+{
+    Vector2 newPos{floatAngleToVec2(vec2distance(pos, anchor), vec2ToAngle(pos - anchor) - rot) + anchor};
+    return CheckCollisionCircleRec(newPos, rad, rec);
+}
+
+Vector2 getScreenCenter()
+{
+    return {GetScreenWidth()/2, GetScreenHeight()/2};
+}
