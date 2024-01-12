@@ -1,11 +1,11 @@
 #include "timer.h"
 
-long long getSystemTimeMil()
+void Timer::init()
 {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    m_timeSinceInit = 0;
 }
 
-long long getMilTimeSince(long long m)
+void Timer::update()
 {
-    return getSystemTimeMil() - m;
+    m_timeSinceInit += lowerLimitFrameTime();
 }

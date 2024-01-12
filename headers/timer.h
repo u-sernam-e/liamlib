@@ -1,8 +1,18 @@
 #ifndef TIMER
 #define TIMER
-#include <chrono>
+#include "ob.h"
+#include "rayextended.h"
 
-long long getSystemTimeMil();
-long long getMilTimeSince(long long m);
+class Timer : public Ob
+{
+private:
+    float m_timeSinceInit;
+public:
+    void init() override;
+    void update() override;
+
+    float currentTime() { return m_timeSinceInit; }
+    float timeSince(float a) { return m_timeSinceInit - a; }
+};
 
 #endif

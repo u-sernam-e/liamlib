@@ -2,9 +2,9 @@
 
 void Button::update()
 {
-    Vector2 activePos{(m_anchorRight ? GetScreenWidth() - m_pos.x : m_pos.x), (m_anchorBot ? GetScreenHeight() - m_pos.y : m_pos.y)};
+    Vector2 activePos{(m_anchorRight ? GetScreenWidth() - m_pos.x : m_pos.x), (m_anchorBot ? GetScreenHeight() - m_pos.y : m_pos.y)}; // area where you can click on button
     
-    if (CheckCollisionPointRec(GetMousePosition(), {activePos.x, activePos.y, m_size.x, m_size.y}))
+    if (CheckCollisionPointRec(GetMousePosition(), {activePos.x, activePos.y, m_size.x, m_size.y})) // if the mouse is over the button, change the state
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             m_state = PRESSED;
@@ -15,13 +15,27 @@ void Button::update()
         else
             m_state = HOVER;
     }
-    else
+    else // else keep the state as up
     {
         m_state = UP;
     }
 }
 
-int maxXTextSize(const std::string& txt, Font font, int xSize, int depth) // for the text when no texture
+Color getClashingColor(Color c) // returns a color that will go well with the input color (right now it just outputs black or white)
+{
+    Color output{WHITE};
+
+    const float rLum{0.2126}; // these are the luminence values of each color (people are most sensitive to green, then red, then blue)
+    const float gLum{0.7152};
+    const float bLum{0.0722};
+
+    if ((rLum*c.r + gLum*c.g + bLum*c.b) > (rLum*255 + gLum*255 + bLum*255)/2) // see if the luminence values of the color are brighter than the midpoint of brightness
+        output = BLACK;
+    
+    return output;
+}
+
+int maxXTextSize(const std::string& txt, Font font, int xSize, int depth) // changes the size of the text based on the buttonsize
 {
     int maxSize{xSize-10};
     int minSize{};
@@ -43,23 +57,23 @@ int maxXTextSize(const std::string& txt, Font font, int xSize, int depth) // for
             break;
     }
     return (maxSize + minSize) / 2;
-}
+} 
 
 void Button::draw()
 {
     if (m_hidden)
         return;
 
-    Vector2 activePos{(m_anchorRight ? GetScreenWidth() - m_pos.x : m_pos.x), (m_anchorBot ? GetScreenHeight() - m_pos.y : m_pos.y)};
+    Vector2 activePos{(m_anchorRight ? GetScreenWidth() - m_pos.x : m_pos.x), (m_anchorBot ? GetScreenHeight() - m_pos.y : m_pos.y)}; // same equation as in update
 
-    Color col{};
+    Color col{}; // setting the button color
     switch (m_state)
     {
         case HOVER:
+        case RELEASED:
             col = m_hoverTint;
             break;
         case UP:
-        case RELEASED:
             col = m_upTint;
             break;
         case DOWN:
@@ -67,13 +81,26 @@ void Button::draw()
             col = m_downTint;
             break;
     }
-    if (m_hasTxtr)
+
+    if (!m_useCustomTxtColor)
+        m_txtColor = getClashingColor(col);
+
+    if (m_hasTxtr) // if it has a texture, then it draws it as a ninepatch
         DrawTextureNPatch(m_txtr, m_nPatchInfo, {activePos.x, activePos.y, m_size.x, m_size.y}, {0, 0}, 0, col);
     else
         DrawRectangleV(activePos, m_size, col);
 
-    int fsize{std::min(static_cast<int>(m_size.y) - 10, maxXTextSize(m_txt, m_font, m_size.x, 10))};
-    DrawTextEx(m_font, m_txt.c_str(), Vector2{(activePos.x + m_size.x/2) - MeasureTextEx(m_font, m_txt.c_str(), fsize, 2).x/2, (activePos.y + m_size.y/2) - fsize/2}, fsize, 2, WHITE);
+    Font txtFont{GetFontDefault()};
+
+    if (m_fs)
+        txtFont=m_fs->get(m_fontStr, 50);
+
+    int fsize{std::min(static_cast<int>(m_size.y) - 10, maxXTextSize(m_txt, txtFont, m_size.x, 10))};
+
+    if (m_fs)
+        txtFont=m_fs->get(m_fontStr, fsize);
+
+    DrawTextEx(txtFont, m_txt.c_str(), Vector2{(activePos.x + m_size.x/2) - MeasureTextEx(txtFont, m_txt.c_str(), fsize, 2).x/2, (activePos.y + m_size.y/2) - fsize/2}, fsize, 2, m_txtColor);
 }
 
 

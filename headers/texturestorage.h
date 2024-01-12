@@ -38,7 +38,4 @@ public:
     }
 };
 
-TextureStorage& txtrStrg(); // im a sneaky snitch, i use a function instead of a pure global variable to get past c++ being stupid asf
-                            // also you probably shouldn't make a local TextureStorage, i think it would just waste memory
-
 #endif

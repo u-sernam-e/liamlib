@@ -1,11 +1,11 @@
 #ifndef BUTTON
 #define BUTTON
-#include "rayextended.h"
-#include "ob.h"
+#include "uielement.h"
+#include "fontstorage.h"
 #include <string>
 #include <algorithm>
 
-class Button : public Ob
+class Button : public UiElement
 {
 private:
     enum State
@@ -22,9 +22,12 @@ private:
     Color m_upTint{};
     Color m_hoverTint{};
     Color m_downTint{};
+    Color m_txtColor{};
+    bool m_useCustomTxtColor{};
     Texture2D m_txtr{};
     std::string m_txt{};
-    Font m_font{};
+    FontStorage* m_fs{};
+    std::string m_fontStr{};
     bool m_hasTxtr{};
     NPatchInfo m_nPatchInfo{};
     State m_state{};
@@ -32,7 +35,7 @@ private:
     bool m_anchorBot{};
     bool m_hidden{};
 public:
-    Button(Vector2 pos, Vector2 size, Color upTint, Color downTint, Color hoverTint, std::string text, const Texture2D& texture, bool isTxtrd=false, bool anchorRight=false, bool anchorBot=false, Font font=GetFontDefault(), int nPatchMarginVert=8, int nPatchMarginHorz=8)
+    Button(Vector2 pos, Vector2 size, Color upTint, Color downTint, Color hoverTint, std::string text, Color txtColor=WHITE, bool useCustomTxtColor=false, bool anchorRight=false, bool anchorBot=false, Texture2D texture={}, bool isTxtrd=false, FontStorage* fs=nullptr, std::string fontStr="", int nPatchMarginVert=8, int nPatchMarginHorz=8)
         : m_pos{pos}
         , m_size{size}
         , m_anchorRight{anchorRight}
@@ -41,10 +44,13 @@ public:
         , m_downTint{downTint}
         , m_hoverTint{hoverTint}
         , m_txt{text}
+        , m_txtColor{txtColor}
+        , m_useCustomTxtColor{useCustomTxtColor}
         , m_hasTxtr{isTxtrd}
-        , m_txtr{texture}
+        , m_txtr{texture} 
         , m_state{UP}
-        , m_font{font}
+        , m_fs{fs}
+        , m_fontStr{fontStr}
         , m_nPatchInfo{{0, 0, texture.width, texture.height}, nPatchMarginHorz, nPatchMarginVert, nPatchMarginHorz, nPatchMarginVert, NPATCH_NINE_PATCH}
     {}
 
@@ -54,7 +60,7 @@ public:
     void draw() override;
 
     void setPos(Vector2 p) {m_pos = p;}
-    Vector2 getPos() {
+    Vector2 getPos() override {
         Vector2 FUCK{m_pos};
         if (m_anchorRight)
             FUCK.x = GetScreenWidth() - FUCK.x;
@@ -73,6 +79,8 @@ public:
 
     void setHid(bool hidden) {m_hidden = hidden;}
     bool getHid() {return m_hidden;}
+
+    std::string getElementTypeName() override {return "button";}
 };
 
 #endif

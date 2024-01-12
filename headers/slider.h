@@ -1,16 +1,16 @@
 #ifndef SLIDER
 #define SLIDER
 #include "rayextended.h"
-#include "ob.h"
+#include "uielement.h"
 
-class Slider : public Ob
+class Slider : public UiElement
 {
 private:
     enum State
     {
         UP,
         ACTIVE,
-        HOVER,
+        HOVER, 
         MAXBUTTONSTATE
     };
     State m_state{};
@@ -20,10 +20,10 @@ private:
     Color m_upTint{};
     Color m_hoverTint{};
     Color m_activeTint{};
-    const Texture2D& m_knobTxtr{};
-    const Texture2D& m_lineTxtr{};
+    const Texture2D m_knobTxtr{};
+    const Texture2D m_lineTxtr{};
 public:
-    Slider(Vector2 pos, const Texture2D& knobTexture, const Texture2D& lineTexture, Color upTint, Color activeTint, Color hoverTint, bool isVertical)
+    Slider(Vector2 pos, const Texture2D knobTexture, const Texture2D lineTexture, Color upTint, Color activeTint, Color hoverTint, bool isVertical)
         : m_pos{pos}
         , m_knobTxtr{knobTexture}
         , m_lineTxtr{lineTexture}
@@ -37,6 +37,8 @@ public:
     void draw() override;
 
     float value() { return m_value; }
+
+    std::string getElementTypeName() override {return "slider";}
 };
 
 #endif

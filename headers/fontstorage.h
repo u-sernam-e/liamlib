@@ -4,39 +4,56 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <iostream>
 
 class FontStorage
 {
 private:
-    std::vector<std::pair<std::array<Font, 2>, std::string>> m_fonts;
+    std::vector<std::pair<std::vector<std::pair<Font, int>>, std::string>> m_fonts; // this is the most incredible type i've ever seen... the int represents font size and the string represents the file name
 public:
     void init(const std::vector<std::string>& fontStrs) // call this AFTER you call InitWindow()
     {
         for (int i{}; i < fontStrs.size(); ++i)
         {
-            m_fonts.push_back({{LoadFontEx(fontStrs[i].c_str(), 256, 0, 0), LoadFontEx(fontStrs[i].c_str(), 12, 0, 0)}, fontStrs[i]});
-            SetTextureFilter(m_fonts[i].first[0].texture, TEXTURE_FILTER_BILINEAR);
-            SetTextureFilter(m_fonts[i].first[1].texture, TEXTURE_FILTER_BILINEAR);
+            m_fonts.push_back({{}, fontStrs[i]});
         }
     }
 
     ~FontStorage()
     {
-        for (auto& f : m_fonts)
-        {
-            UnloadFont(f.first[0]);
-            UnloadFont(f.first[1]);
-        }
+        clearFonts();
     }
 
-    const Font& get(std::string s, bool lowQuality) const
+    const Font& get(std::string name, int fontsize) // gwvoil;ujkres;hvdjnhv;ioelldsrdfhnjgrbfhnjgoboeldldsrkhjnfrgbkhjngb;;oeirghjvnhjvno;lhjrngrgi
     {
-        for (auto& t : m_fonts)
+        for (auto& font : m_fonts)
         {
-            if (t.second == s)
-                return (lowQuality ? t.first[1] : t.first[0]);
+            if (font.second == name)
+            {
+                for (auto& fpair : font.first)
+                {
+                    if (fpair.second == fontsize)
+                    {
+                        return fpair.first;
+                    }
+                }
+                font.first.push_back({LoadFontEx(name.c_str(), fontsize, 0, 0), fontsize});
+                return font.first[font.first.size()-1].first;
+            }
         }
-        return m_fonts[0].first[0];
+        return GetFontDefault();
+    }
+
+    void clearFonts()
+    {
+        for (auto& font : m_fonts)
+        {
+            for (int i{font.first.size()-1}; i >= 0; --i)
+            {
+                UnloadFont(font.first[i].first);
+                font.first.pop_back();
+            }
+        }
     }
 };
 

@@ -1,11 +1,11 @@
 #ifndef TEXTINPUT
 #define TEXTINPUT
-#include "ob.h"
+#include "uielement.h"
 #include "rayextended.h"
 #include "fontstorage.h"
 #include <string>
 
-class TextInput : public Ob
+class TextInput : public UiElement
 {
 private:
     // technically any of these could be public vars
@@ -83,6 +83,8 @@ public:
 
     void setSize(Vector2 s) {m_size = s;}
     Vector2 getSize() {return m_size;}
+
+    std::string getElementTypeName() override {return "textinput";}
 };  
 
 #endif

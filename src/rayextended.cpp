@@ -58,6 +58,11 @@ bool operator==(const Vector2& a, const Vector2& b)
 bool operator!=(const Vector2& a, const Vector2& b)
 { return a.x != b.x || a.y != b.y; }
 
+bool operator==(const Color& a, const Color& b)
+{ return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a; }
+bool operator!=(const Color& a, const Color& b)
+{ return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;}
+
 Vector2 vecAbs(const Vector2& a)
 { return {std::abs(a.x), std::abs(a.y)}; }
 // this could be optimized with a faster sqrt func
@@ -69,6 +74,9 @@ float lowerLimitFrameTime()
         return 0.0667;
     return GetFrameTime();
 }
+float getRandomFloat(float min, float max) { return static_cast<float>(GetRandomValue(static_cast<int>(min), static_cast<int>(max))); }
+Vector2 getScreenSize() { return {static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}; }
+
 float vec2ToFloat(Vector2 x)
 {
     return vec2distance(x, {0, 0});
@@ -85,6 +93,18 @@ float vec2ToAngle(Vector2 x)
 Vector2 floatAngleToVec2(float x, float angle)
 {
     return {cosf(angle * DEG2RAD) * x, sinf(angle * DEG2RAD) * x};
+}
+Vector2 getRotatedVec2(Vector2 vec2, Vector2 origin, float angle)
+{
+    return origin + floatAngleToVec2(vec2ToFloat(vec2-origin), vec2ToAngle(vec2-origin) + angle);
+}
+Vector2 getVec2AtAngle(Vector2 vec2, Vector2 origin, float angle)
+{
+    return origin + floatAngleToVec2(vec2ToFloat(vec2-origin), angle);
+}
+Vector2 normalizedVec2(Vector2 vec2)
+{
+    return floatAngleToVec2(1, vec2ToAngle(vec2));
 }
 
 Rectangle getRotatedRecBounds(Rectangle rec, float rot, Vector2 anchor)
@@ -126,5 +146,5 @@ bool checkCollisionCircleRotatedRec(Vector2 pos, float rad, Rectangle rec, float
 
 Vector2 getScreenCenter()
 {
-    return {GetScreenWidth()/2, GetScreenHeight()/2};
+    return getScreenSize()/2;
 }
